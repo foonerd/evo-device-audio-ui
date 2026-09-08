@@ -1,28 +1,101 @@
-# evo-device-audio-ui
+# evo UI engineering workspace
 
-Public release repository for the evo reference audio-device UI layer.
+Implementation workspace for the `evo` next-generation UI: the operator-facing shell, its runtime service, and the contracts they land against.
 
 ## Purpose
 
-`evo-device-audio-ui` is the reference-device shell and packaging layer for audio-focused deployments on evo.
+High-velocity workspace for:
 
-It is the "device release layer" that composes:
+- UI prototyping and exploration
+- contract-first integration with the framework
+- showcase UX shaping for the reference device
+- readiness and risk governance
 
-- generic UI platform capabilities (from `evo-ui`)
-- audio-domain contracts and surfaces (from `evo-device-audio`)
-- gateway/runtime interaction contracts (from `evo-core`)
-
-## Position in the repo model
-
-- `evo-ui-eng`: private generic UI engineering/prototyping
-- `evo-ui`: public generic UI release stream
-- `evo-device-audio-ui` (this repo): public reference audio-device UI release stream
+This workspace evolves quickly and may contain unstable work-in-progress.
 
 ## Scope
 
-- Ship the reference `ui_shell` experience for the audio reference device.
-- Remain vendor-neutral at reference-device level.
-- Demonstrate the full showcase interaction model (framework + plugins + device UX).
+- Build the complete, intuitive, appealing human layer for the evo showcase device.
+- Preserve strict separation between:
+  - runtime semantics (the framework core + device plugins)
+  - UI transport adapter (the runtime service)
+  - presentation and theming (the shell)
+- Keep ecosystem extensibility first-class (vendors, community plugins, diverse hardware targets).
+
+## Delivery layout
+
+- `CONCEPT/`: reference-only material (do not use for delivery code)
+- `apps/`: active implementation scaffolds and feature delivery
+- `docs/`: contracts, playbook, and per-surface implementation guidance
+
+See `DEVELOPING.md` for local workflow. See `docs/DEV-TOOLCHAIN.md` for the dev-box toolchain reference.
+
+## Community quickstart
+
+If you are evaluating this workspace and want a working flow quickly:
+
+Prerequisites:
+
+- development host uses Node.js 22 LTS or newer for `apps/evo-ui-shell`
+- supported target devices run a current Debian / Raspberry Pi OS release; no Node install required on target for artifact deploy
+- mandatory full framework validation gate before merge/deploy:
+
+```bash
+cargo clean
+cargo fmt --all -- --check
+cargo clippy --workspace --all-targets --locked -- -D warnings
+cargo test --workspace --all-targets --locked
+cargo build --workspace --locked
+```
+
+or run:
+
+```bash
+./scripts/validate-evo-core-prereq.sh
+```
+
+1. Build shell:
+
+```bash
+cd apps/evo-ui-shell
+npm install
+npm run build
+```
+
+1. Build runtime:
+
+```bash
+cd ../evo-ui-runtime
+cargo build --release --target aarch64-unknown-linux-gnu
+```
+
+1. Deploy artifact-only to a device:
+
+```bash
+./scripts/device/deploy-runtime-service-pi.sh <user>@<device-host-or-ip>
+```
+
+1. Verify:
+
+```bash
+curl -i http://<device-host-or-ip>/api/ui/v1/health
+curl -i http://<device-host-or-ip>/api/ui/v1/capabilities
+curl -i http://<device-host-or-ip>/api/ui/v1/settings
+```
+
+## Key docs
+
+- `docs/UI_DELIVERY_PLAYBOOK_V1.md`
+- `docs/implementation/GATEWAY_BOOTSTRAP.md`
+- `docs/implementation/PLAYBACK_BASELINE.md`
+- `docs/implementation/OPERATIONS_ADMIN.md`
+- `docs/UI_PERFORMANCE_CONTRACT_V1.md`
+- `docs/UI_LAYER_CONTRACT.md`
+- `docs/UI_API_V1.md`
+- `docs/UI_TO_CORE_MAPPING_V1.md`
+- `docs/UI_CAPABILITIES_V1.md`
+- `docs/UI_ERROR_MODEL_V1.md`
+- `docs/UI_SECURITY_PROFILE_V1.md`
 
 ## Ownership and marks
 
